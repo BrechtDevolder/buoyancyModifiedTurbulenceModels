@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::kOmegaSST
+    Foam::kOmegaSSTBuoyancy
 
 Group
     grpTurbulence
@@ -77,7 +77,7 @@ Description
 
     The default model coefficients are
     \verbatim
-        kOmegaSSTCoeffs
+        kOmegaSSTBuoyancyCoeffs
         {
             alphaK1     0.85;
             alphaK2     1.0;
@@ -96,12 +96,12 @@ Description
     \endverbatim
 
 SourceFiles
-    kOmegaSST.C
+    kOmegaSSTBuoyancy.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef kOmegaSSTBase_H
-#define kOmegaSSTBase_H
+#ifndef kOmegaSSTBuoyancyBase_H
+#define kOmegaSSTBuoyancyBase_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -109,19 +109,19 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class kOmegaSST Declaration
+                           Class kOmegaSSTBuoyancy Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-class kOmegaSST
+class kOmegaSSTBuoyancy
 :
     public TurbulenceModel
 {
     // Private Member Functions
 
         // Disallow default bitwise copy construct and assignment
-        kOmegaSST(const kOmegaSST&);
-        void operator=(const kOmegaSST&);
+        kOmegaSSTBuoyancy(const kOmegaSSTBuoyancy&);
+        void operator=(const kOmegaSSTBuoyancy&);
 
 
 protected:
@@ -258,7 +258,7 @@ public:
     // Constructors
 
         //- Construct from components
-        kOmegaSST
+        kOmegaSSTBuoyancy
         (
             const word& type,
             const alphaField& alpha,
@@ -272,7 +272,7 @@ public:
 
 
     //- Destructor
-    virtual ~kOmegaSST()
+    virtual ~kOmegaSSTBuoyancy()
     {}
 
 
@@ -345,7 +345,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 #ifdef NoRepository
-    #include "kOmegaSSTBase.C"
+    #include "kOmegaSSTBuoyancyBase.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

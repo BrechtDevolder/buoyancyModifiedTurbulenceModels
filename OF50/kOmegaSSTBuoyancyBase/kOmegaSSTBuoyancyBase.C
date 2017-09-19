@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "kOmegaSSTBase.H"
+#include "kOmegaSSTBuoyancyBase.H"
 #include "fvOptions.H"
 #include "bound.H"
 #include "wallDist.H"
@@ -37,7 +37,7 @@ namespace Foam
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F1
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F1
 (
     const volScalarField& CDkOmega
 ) const
@@ -67,7 +67,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F1
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F2() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F2() const
 {
     tmp<volScalarField> arg2 = min
     (
@@ -84,7 +84,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F2() const
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F3() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F3() const
 {
     tmp<volScalarField> arg3 = min
     (
@@ -97,7 +97,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F3() const
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F23() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F23() const
 {
     tmp<volScalarField> f23(F2());
 
@@ -111,7 +111,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F23() const
 
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correctNut
+void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correctNut
 (
     const volScalarField& S2,
     const volScalarField& F2
@@ -128,7 +128,7 @@ void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correctNut
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correctNut()
+void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correctNut()
 {
     correctNut(2*magSqr(symm(fvc::grad(this->U_))), F23());
 }
@@ -136,7 +136,7 @@ void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correctNut()
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField::Internal>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::Pk
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::Pk
 (
     const volScalarField::Internal& G
 ) const
@@ -147,7 +147,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::Pk
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField::Internal>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::epsilonByk
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::epsilonByk
 (
     const volScalarField::Internal& F1,
     const volScalarField::Internal& F2
@@ -159,7 +159,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::epsilonByk
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<fvScalarMatrix>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kSource() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kSource() const
 {
     return tmp<fvScalarMatrix>
     (
@@ -174,7 +174,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kSource() const
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<fvScalarMatrix>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::omegaSource() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::omegaSource() const
 {
     return tmp<fvScalarMatrix>
     (
@@ -188,7 +188,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::omegaSource() const
 
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-tmp<fvScalarMatrix> kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::Qsas
+tmp<fvScalarMatrix> kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::Qsas
 (
     const volScalarField::Internal& S2,
     const volScalarField::Internal& gamma,
@@ -209,7 +209,7 @@ tmp<fvScalarMatrix> kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::Qsas
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy
 (
     const word& type,
     const alphaField& alpha,
@@ -386,7 +386,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-bool kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::read()
+bool kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::read()
 {
     if (TurbulenceModel::read())
     {
@@ -414,7 +414,7 @@ bool kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::read()
 
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correct()
+void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
 {
     if (!this->turbulence_)
     {
@@ -423,7 +423,7 @@ void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correct()
 
     // Local references
     const alphaField& alpha = this->alpha_;
-    const rhoField& rho = this->rho_;
+    //const rhoField& rho = this->rho_;
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
     const volVectorField& U = this->U_;
     volScalarField& nut = this->nut_;
@@ -453,6 +453,38 @@ void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correct()
     volScalarField F1(this->F1(CDkOmega));
     volScalarField F23(this->F23());
 
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -start (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+        
+    // Access to the density
+    volScalarField& rho_ = const_cast<volScalarField&>
+        (
+          this->mesh_.objectRegistry::template
+          lookupObject<volScalarField>("rho")
+        );
+
+    // Mass flux
+    surfaceScalarField rhoPhi = fvc::interpolate(rho_)*this->phi_;
+
+    // Gravitational acceleration
+    dimensionedVector g
+    (
+		"g",
+		dimensionSet(0, 1, -2, 0, 0, 0, 0),
+		vector(0, 0, -9.81)
+    );
+    
+    // Constant coefficients
+    scalar sigmaT = 0.85;	//turbulent Prandtl number (dimensionless)
+    
+    // Buoyancy correction term
+    volScalarField Gb("Gb", -nut/sigmaT*(g & fvc::grad(rho_)));
+
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -end (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+
     {
         volScalarField::Internal gamma(this->gamma(F1));
         volScalarField::Internal beta(this->beta(F1));
@@ -460,27 +492,27 @@ void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correct()
         // Turbulent frequency equation
         tmp<fvScalarMatrix> omegaEqn
         (
-            fvm::ddt(alpha, rho, omega_)
-          + fvm::div(alphaRhoPhi, omega_)
-          - fvm::laplacian(alpha*rho*DomegaEff(F1), omega_)
+            fvm::ddt(alpha, rho_, omega_)
+          + fvm::div(rhoPhi, omega_)
+          - fvm::laplacian(alpha*rho_*DomegaEff(F1), omega_)
          ==
-            alpha()*rho()*gamma
+            alpha()*rho_()*gamma
            *min
             (
                 GbyNu,
                 (c1_/a1_)*betaStar_*omega_()
                *max(a1_*omega_(), b1_*F23()*sqrt(S2()))
             )
-          - fvm::SuSp((2.0/3.0)*alpha()*rho()*gamma*divU, omega_)
-          - fvm::Sp(alpha()*rho()*beta*omega_(), omega_)
+          - fvm::SuSp((2.0/3.0)*alpha()*rho_()*gamma*divU, omega_)
+          - fvm::Sp(alpha()*rho_()*beta*omega_(), omega_)
           - fvm::SuSp
             (
-                alpha()*rho()*(F1() - scalar(1))*CDkOmega()/omega_(),
+                alpha()*rho_()*(F1() - scalar(1))*CDkOmega()/omega_(),
                 omega_
             )
-          + Qsas(S2(), gamma, beta)
-          + omegaSource()
-          + fvOptions(alpha, rho, omega_)
+          + rho_*Qsas(S2(), gamma, beta)
+          + rho_*omegaSource()
+          + fvOptions(alpha, rho_, omega_)
         );
 
         omegaEqn.ref().relax();
@@ -494,15 +526,16 @@ void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correct()
     // Turbulent kinetic energy equation
     tmp<fvScalarMatrix> kEqn
     (
-        fvm::ddt(alpha, rho, k_)
-      + fvm::div(alphaRhoPhi, k_)
-      - fvm::laplacian(alpha*rho*DkEff(F1), k_)
+        fvm::ddt(alpha, rho_, k_)
+      + fvm::div(rhoPhi, k_)
+      - fvm::laplacian(alpha*rho_*DkEff(F1), k_)
      ==
-        alpha()*rho()*Pk(G)
-      - fvm::SuSp((2.0/3.0)*alpha()*rho()*divU, k_)
-      - fvm::Sp(alpha()*rho()*epsilonByk(F1, F23), k_)
-      + kSource()
-      + fvOptions(alpha, rho, k_)
+        alpha()*rho_()*Pk(G)
+      + fvm::Sp(Gb/k_, k_)	//buoyancy correction in k-eqn (Brecht DEVOLDER, 19 september 2017)
+      - fvm::SuSp((2.0/3.0)*alpha()*rho_()*divU, k_)
+      - fvm::Sp(alpha()*rho_()*epsilonByk(F1, F23), k_)
+      + rho_*kSource()
+      + fvOptions(alpha, rho_, k_)
     );
 
     kEqn.ref().relax();
