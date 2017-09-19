@@ -56,6 +56,15 @@ are published:
 			printCoeffs     on;
 		}
 
+- Modify system/fvSchemes:
+
+		div(phi,k)
+		div(phi,omega)
+		
+	to
+
+		div((interpolate(rho)*phi),k)
+		div((interpolate(rho)*phi),omega)
 
 ## Tutorials
 *coming soon...*
