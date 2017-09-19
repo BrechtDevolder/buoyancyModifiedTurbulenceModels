@@ -42,7 +42,7 @@ are published:
 
 		libs
 		(
-			"libbuoyancyModifiedTurbulencemodels.so"
+			"libbuoyancyModifiedTurbulenceModels.so"
 		);
 		
 - Add to correct turbulence model in constant/turbulenceProperties:
@@ -51,7 +51,7 @@ are published:
 
 		RAS
 		{
-			RASModel        kOmegaSSTBuoyancy; //kOmegaBuoyancy
+			RASModel        kOmegaSSTBuoyancy; //kOmegaBuoyancy;
 			turbulence      on;
 			printCoeffs     on;
 		}
