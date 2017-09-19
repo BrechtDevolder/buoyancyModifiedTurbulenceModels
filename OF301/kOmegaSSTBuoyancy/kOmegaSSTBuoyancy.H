@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::RASModels::kOmegaSST
+    Foam::RASModels::kOmegaSSTBuoyancy
 
 Group
     grpRASTurbulence
@@ -77,7 +77,7 @@ Description
 
     The default model coefficients are
     \verbatim
-        kOmegaSSTCoeffs
+        kOmegaSSTBuoyancyCoeffs
         {
             alphaK1     0.85;
             alphaK2     1.0;
@@ -96,12 +96,12 @@ Description
     \endverbatim
 
 SourceFiles
-    kOmegaSST.C
+    kOmegaSSTBuoyancy.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef kOmegaSST_H
-#define kOmegaSST_H
+#ifndef kOmegaSSTBuoyancy_H
+#define kOmegaSSTBuoyancy_H
 
 #include "RASModel.H"
 #include "eddyViscosity.H"
@@ -114,19 +114,19 @@ namespace RASModels
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class kOmegaSST Declaration
+                           Class kOmegaSSTBuoyancy Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class BasicTurbulenceModel>
-class kOmegaSST
+class kOmegaSSTBuoyancy
 :
     public eddyViscosity<RASModel<BasicTurbulenceModel> >
 {
     // Private Member Functions
 
         // Disallow default bitwise copy construct and assignment
-        kOmegaSST(const kOmegaSST&);
-        kOmegaSST& operator=(const kOmegaSST&);
+        kOmegaSSTBuoyancy(const kOmegaSSTBuoyancy&);
+        kOmegaSSTBuoyancy& operator=(const kOmegaSSTBuoyancy&);
 
 
 protected:
@@ -228,13 +228,13 @@ public:
 
 
     //- Runtime type information
-    TypeName("kOmegaSST");
+    TypeName("kOmegaSSTBuoyancy");
 
 
     // Constructors
 
         //- Construct from components
-        kOmegaSST
+        kOmegaSSTBuoyancy
         (
             const alphaField& alpha,
             const rhoField& rho,
@@ -248,7 +248,7 @@ public:
 
 
     //- Destructor
-    virtual ~kOmegaSST()
+    virtual ~kOmegaSSTBuoyancy()
     {}
 
 
@@ -322,7 +322,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 #ifdef NoRepository
-#   include "kOmegaSST.C"
+#   include "kOmegaSSTBuoyancy.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

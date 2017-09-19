@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "kOmegaSST.H"
+#include "kOmegaSSTBuoyancy.H"
 #include "bound.H"
 #include "wallDist.H"
 
@@ -37,7 +37,7 @@ namespace RASModels
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 template<class BasicTurbulenceModel>
-tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F1
+tmp<volScalarField> kOmegaSSTBuoyancy<BasicTurbulenceModel>::kOmegaSSTBuoyancy::F1
 (
     const volScalarField& CDkOmega
 ) const
@@ -66,7 +66,7 @@ tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F1
 }
 
 template<class BasicTurbulenceModel>
-tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F2() const
+tmp<volScalarField> kOmegaSSTBuoyancy<BasicTurbulenceModel>::kOmegaSSTBuoyancy::F2() const
 {
     tmp<volScalarField> arg2 = min
     (
@@ -82,7 +82,7 @@ tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F2() const
 }
 
 template<class BasicTurbulenceModel>
-tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F3() const
+tmp<volScalarField> kOmegaSSTBuoyancy<BasicTurbulenceModel>::kOmegaSSTBuoyancy::F3() const
 {
     tmp<volScalarField> arg3 = min
     (
@@ -94,7 +94,7 @@ tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F3() const
 }
 
 template<class BasicTurbulenceModel>
-tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F23() const
+tmp<volScalarField> kOmegaSSTBuoyancy<BasicTurbulenceModel>::kOmegaSSTBuoyancy::F23() const
 {
     tmp<volScalarField> f23(F2());
 
@@ -108,7 +108,7 @@ tmp<volScalarField> kOmegaSST<BasicTurbulenceModel>::kOmegaSST::F23() const
 
 
 template<class BasicTurbulenceModel>
-void kOmegaSST<BasicTurbulenceModel>::correctNut(const volScalarField& S2)
+void kOmegaSSTBuoyancy<BasicTurbulenceModel>::correctNut(const volScalarField& S2)
 {
     this->nut_ = a1_*k_/max(a1_*omega_, b1_*F23()*sqrt(S2));
     this->nut_.correctBoundaryConditions();
@@ -120,14 +120,14 @@ void kOmegaSST<BasicTurbulenceModel>::correctNut(const volScalarField& S2)
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 template<class BasicTurbulenceModel>
-void kOmegaSST<BasicTurbulenceModel>::correctNut()
+void kOmegaSSTBuoyancy<BasicTurbulenceModel>::correctNut()
 {
     correctNut(2*magSqr(symm(fvc::grad(this->U_))));
 }
 
 
 template<class BasicTurbulenceModel>
-tmp<fvScalarMatrix> kOmegaSST<BasicTurbulenceModel>::kSource() const
+tmp<fvScalarMatrix> kOmegaSSTBuoyancy<BasicTurbulenceModel>::kSource() const
 {
     return tmp<fvScalarMatrix>
     (
@@ -141,7 +141,7 @@ tmp<fvScalarMatrix> kOmegaSST<BasicTurbulenceModel>::kSource() const
 
 
 template<class BasicTurbulenceModel>
-tmp<fvScalarMatrix> kOmegaSST<BasicTurbulenceModel>::omegaSource() const
+tmp<fvScalarMatrix> kOmegaSSTBuoyancy<BasicTurbulenceModel>::omegaSource() const
 {
     return tmp<fvScalarMatrix>
     (
@@ -155,7 +155,7 @@ tmp<fvScalarMatrix> kOmegaSST<BasicTurbulenceModel>::omegaSource() const
 
 
 template<class BasicTurbulenceModel>
-tmp<fvScalarMatrix> kOmegaSST<BasicTurbulenceModel>::Qsas
+tmp<fvScalarMatrix> kOmegaSSTBuoyancy<BasicTurbulenceModel>::Qsas
 (
     const volScalarField& S2,
     const volScalarField& gamma,
@@ -176,7 +176,7 @@ tmp<fvScalarMatrix> kOmegaSST<BasicTurbulenceModel>::Qsas
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class BasicTurbulenceModel>
-kOmegaSST<BasicTurbulenceModel>::kOmegaSST
+kOmegaSSTBuoyancy<BasicTurbulenceModel>::kOmegaSSTBuoyancy
 (
     const alphaField& alpha,
     const rhoField& rho,
@@ -359,7 +359,7 @@ kOmegaSST<BasicTurbulenceModel>::kOmegaSST
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class BasicTurbulenceModel>
-bool kOmegaSST<BasicTurbulenceModel>::read()
+bool kOmegaSSTBuoyancy<BasicTurbulenceModel>::read()
 {
     if (eddyViscosity<RASModel<BasicTurbulenceModel> >::read())
     {
@@ -387,7 +387,7 @@ bool kOmegaSST<BasicTurbulenceModel>::read()
 
 
 template<class BasicTurbulenceModel>
-void kOmegaSST<BasicTurbulenceModel>::correct()
+void kOmegaSSTBuoyancy<BasicTurbulenceModel>::correct()
 {
     if (!this->turbulence_)
     {

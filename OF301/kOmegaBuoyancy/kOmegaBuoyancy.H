@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::RASModels::kOmega
+    Foam::RASModels::kOmegaBuoyancy
 
 Group
     grpRASTurbulence
@@ -40,7 +40,7 @@ Description
 
     The default model coefficients are
     \verbatim
-        kOmegaCoeffs
+        kOmegaBuoyancyCoeffs
         {
             Cmu         0.09;  // Equivalent to betaStar
             alpha       0.52;
@@ -51,12 +51,12 @@ Description
     \endverbatim
 
 SourceFiles
-    kOmega.C
+    kOmegaBuoyancy.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef kOmega_H
-#define kOmega_H
+#ifndef kOmegaBuoyancy_H
+#define kOmegaBuoyancy_H
 
 #include "RASModel.H"
 #include "eddyViscosity.H"
@@ -69,11 +69,11 @@ namespace RASModels
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class kOmega Declaration
+                           Class kOmegaBuoyancy Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class BasicTurbulenceModel>
-class kOmega
+class kOmegaBuoyancy
 :
     public eddyViscosity<RASModel<BasicTurbulenceModel> >
 {
@@ -110,13 +110,13 @@ public:
 
 
     //- Runtime type information
-    TypeName("kOmega");
+    TypeName("kOmegaBuoyancy");
 
 
     // Constructors
 
         //- Construct from components
-        kOmega
+        kOmegaBuoyancy
         (
             const alphaField& alpha,
             const rhoField& rho,
@@ -130,7 +130,7 @@ public:
 
 
     //- Destructor
-    virtual ~kOmega()
+    virtual ~kOmegaBuoyancy()
     {}
 
 
@@ -208,7 +208,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 #ifdef NoRepository
-#   include "kOmega.C"
+#   include "kOmegaBuoyancy.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
