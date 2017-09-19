@@ -477,8 +477,8 @@ void kOmegaSSTBuoyancy<BasicTurbulenceModel>::correct()
                 alpha*rho_*(F1 - scalar(1))*CDkOmega/omega_,
                 omega_
             )
-          + Qsas(S2, gamma, beta)
-          + omegaSource()
+          + rho_*Qsas(S2, gamma, beta)
+          + rho_*omegaSource()
         );
 
         omegaEqn().relax();
@@ -500,7 +500,7 @@ void kOmegaSSTBuoyancy<BasicTurbulenceModel>::correct()
       + fvm::Sp(Gb/k_, k_)	//buoyancy correction in k-eqn (Brecht DEVOLDER, 19 september 2017)
       - fvm::SuSp((2.0/3.0)*alpha*rho_*divU, k_)
       - fvm::Sp(alpha*rho_*betaStar_*omega_, k_)
-      + kSource()
+      + rho_*kSource()
     );
 
     kEqn().relax();
