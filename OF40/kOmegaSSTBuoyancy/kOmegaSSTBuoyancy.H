@@ -22,23 +22,23 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::RASModels::kOmegaSST
+    Foam::RASModels::kOmegaSSTBuoyancy
 
 Group
     grpRASTurbulence
 
 See also
-    Foam::kOmegaSST
+    Foam::kOmegaSSTBuoyancy
 
 SourceFiles
-    kOmegaSST.C
+    kOmegaSSTBuoyancy.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef kOmegaSST_H
-#define kOmegaSST_H
+#ifndef kOmegaSSTBuoyancy_H
+#define kOmegaSSTBuoyancy_H
 
-#include "kOmegaSSTBase.H"
+#include "kOmegaSSTBuoyancyBase.H"
 #include "RASModel.H"
 #include "eddyViscosity.H"
 
@@ -50,13 +50,13 @@ namespace RASModels
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class kOmegaSST Declaration
+                          Class kOmegaSSTBuoyancy Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class BasicTurbulenceModel>
-class kOmegaSST
+class kOmegaSSTBuoyancy
 :
-    public Foam::kOmegaSST
+    public Foam::kOmegaSSTBuoyancy
     <
         eddyViscosity<RASModel<BasicTurbulenceModel>>,
         BasicTurbulenceModel
@@ -71,13 +71,13 @@ public:
 
 
     //- Runtime type information
-    TypeName("kOmegaSST");
+    TypeName("kOmegaSSTBuoyancy");
 
 
     // Constructors
 
         //- Construct from components
-        kOmegaSST
+        kOmegaSSTBuoyancy
         (
             const alphaField& alpha,
             const rhoField& rho,
@@ -91,7 +91,7 @@ public:
 
 
     //- Destructor
-    virtual ~kOmegaSST()
+    virtual ~kOmegaSSTBuoyancy()
     {}
 };
 
@@ -103,7 +103,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 #ifdef NoRepository
-    #include "kOmegaSST.C"
+    #include "kOmegaSSTBuoyancy.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "kOmegaSSTBase.H"
+#include "kOmegaSSTBuoyancyBase.H"
 #include "fvOptions.H"
 #include "bound.H"
 #include "wallDist.H"
@@ -37,7 +37,7 @@ namespace Foam
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F1
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F1
 (
     const volScalarField& CDkOmega
 ) const
@@ -67,7 +67,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F1
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F2() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F2() const
 {
     tmp<volScalarField> arg2 = min
     (
@@ -84,7 +84,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F2() const
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F3() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F3() const
 {
     tmp<volScalarField> arg3 = min
     (
@@ -97,7 +97,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F3() const
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F23() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy::F23() const
 {
     tmp<volScalarField> f23(F2());
 
@@ -111,7 +111,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST::F23() const
 
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correctNut
+void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correctNut
 (
     const volScalarField& S2,
     const volScalarField& F2
@@ -128,14 +128,14 @@ void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correctNut
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correctNut()
+void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correctNut()
 {
     correctNut(2*magSqr(symm(fvc::grad(this->U_))), F23());
 }
 
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-tmp<volScalarField> kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::epsilonByk
+tmp<volScalarField> kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::epsilonByk
 (
     const volScalarField& F1,
     const volScalarField& F2
@@ -147,7 +147,7 @@ tmp<volScalarField> kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::epsilonByk
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<fvScalarMatrix>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kSource() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kSource() const
 {
     return tmp<fvScalarMatrix>
     (
@@ -162,7 +162,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kSource() const
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<fvScalarMatrix>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::omegaSource() const
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::omegaSource() const
 {
     return tmp<fvScalarMatrix>
     (
@@ -176,7 +176,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::omegaSource() const
 
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-tmp<fvScalarMatrix> kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::Qsas
+tmp<fvScalarMatrix> kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::Qsas
 (
     const volScalarField& S2,
     const volScalarField& gamma,
@@ -197,7 +197,7 @@ tmp<fvScalarMatrix> kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::Qsas
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST
+kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::kOmegaSSTBuoyancy
 (
     const word& type,
     const alphaField& alpha,
@@ -374,7 +374,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-bool kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::read()
+bool kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::read()
 {
     if (BasicTurbulenceModel::read())
     {
@@ -402,7 +402,7 @@ bool kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::read()
 
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
-void kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::correct()
+void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
 {
     if (!this->turbulence_)
     {

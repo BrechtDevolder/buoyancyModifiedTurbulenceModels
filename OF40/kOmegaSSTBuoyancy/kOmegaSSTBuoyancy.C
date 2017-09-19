@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "kOmegaSST.H"
+#include "kOmegaSSTBuoyancy.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,7 +35,7 @@ namespace RASModels
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class BasicTurbulenceModel>
-kOmegaSST<BasicTurbulenceModel>::kOmegaSST
+kOmegaSSTBuoyancy<BasicTurbulenceModel>::kOmegaSSTBuoyancy
 (
     const alphaField& alpha,
     const rhoField& rho,
@@ -47,7 +47,7 @@ kOmegaSST<BasicTurbulenceModel>::kOmegaSST
     const word& type
 )
 :
-    Foam::kOmegaSST
+    Foam::kOmegaSSTBuoyancy
     <
         eddyViscosity<RASModel<BasicTurbulenceModel>>,
         BasicTurbulenceModel
