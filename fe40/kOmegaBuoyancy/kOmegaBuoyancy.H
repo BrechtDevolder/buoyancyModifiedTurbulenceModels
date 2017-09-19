@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::incompressible::RASModels::kOmega
+    Foam::incompressible::RASModels::kOmegaBuoyancy
 
 Description
     Standard high Reynolds-number k-omega turbulence model for
@@ -41,7 +41,7 @@ Description
 
     The default model coefficients correspond to the following:
     @verbatim
-        kOmegaCoeffs
+        kOmegaBuoyancyCoeffs
         {
             Cmu         0.09;  // Equivalent to betaStar
             alpha       0.52;
@@ -52,12 +52,12 @@ Description
     @endverbatim
 
 SourceFiles
-    kOmega.C
+    kOmegaBuoyancy.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef kOmega_H
-#define kOmega_H
+#ifndef kOmegaBuoyancy_H
+#define kOmegaBuoyancy_H
 
 #include "RASModel.H"
 
@@ -71,10 +71,10 @@ namespace RASModels
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class kOmega Declaration
+                           Class kOmegaBuoyancy Declaration
 \*---------------------------------------------------------------------------*/
 
-class kOmega
+class kOmegaBuoyancy
 :
     public RASModel
 {
@@ -99,12 +99,12 @@ class kOmega
 public:
 
     //- Runtime type information
-    TypeName("kOmega");
+    TypeName("kOmegaBuoyancy");
 
     // Constructors
 
         //- Construct from components
-        kOmega
+        kOmegaBuoyancy
         (
             const volVectorField& U,
             const surfaceScalarField& phi,
@@ -113,7 +113,7 @@ public:
 
 
     // Destructor
-    virtual ~kOmega()
+    virtual ~kOmegaBuoyancy()
     {}
 
 

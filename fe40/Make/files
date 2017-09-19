@@ -1,4 +1,4 @@
-kOmega/kOmega.C
-kOmegaSST/kOmegaSST.C
+kOmegaBuoyancy/kOmegaBuoyancy.C
+kOmegaSSTBuoyancy/kOmegaSSTBuoyancy.C
 
 LIB = $(FOAM_USER_LIBBIN)/libbuoyancyModifiedTurbulenceModels

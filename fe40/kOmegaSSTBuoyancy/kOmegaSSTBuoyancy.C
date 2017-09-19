@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "kOmegaSST.H"
+#include "kOmegaSSTBuoyancy.H"
 #include "addToRunTimeSelectionTable.H"
 
 #include "backwardsCompatibilityWallFunctions.H"
@@ -39,12 +39,12 @@ namespace RASModels
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(kOmegaSST, 0);
-addToRunTimeSelectionTable(RASModel, kOmegaSST, dictionary);
+defineTypeNameAndDebug(kOmegaSSTBuoyancy, 0);
+addToRunTimeSelectionTable(RASModel, kOmegaSSTBuoyancy, dictionary);
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-tmp<volScalarField> kOmegaSST::F1(const volScalarField& CDkOmega) const
+tmp<volScalarField> kOmegaSSTBuoyancy::F1(const volScalarField& CDkOmega) const
 {
     volScalarField CDkOmegaPlus = max
     (
@@ -70,7 +70,7 @@ tmp<volScalarField> kOmegaSST::F1(const volScalarField& CDkOmega) const
 }
 
 
-tmp<volScalarField> kOmegaSST::F2() const
+tmp<volScalarField> kOmegaSSTBuoyancy::F2() const
 {
     volScalarField arg2 = min
     (
@@ -86,7 +86,7 @@ tmp<volScalarField> kOmegaSST::F2() const
 }
 
 
-tmp<volScalarField> kOmegaSST::F3() const
+tmp<volScalarField> kOmegaSSTBuoyancy::F3() const
 {
     tmp<volScalarField> arg3 = min
     (
@@ -98,7 +98,7 @@ tmp<volScalarField> kOmegaSST::F3() const
 }
 
 
-tmp<volScalarField> kOmegaSST::F23() const
+tmp<volScalarField> kOmegaSSTBuoyancy::F23() const
 {
     tmp<volScalarField> f23(F2());
 
@@ -113,7 +113,7 @@ tmp<volScalarField> kOmegaSST::F23() const
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-kOmegaSST::kOmegaSST
+kOmegaSSTBuoyancy::kOmegaSSTBuoyancy
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
@@ -299,7 +299,7 @@ kOmegaSST::kOmegaSST
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<volSymmTensorField> kOmegaSST::R() const
+tmp<volSymmTensorField> kOmegaSSTBuoyancy::R() const
 {
     return tmp<volSymmTensorField>
     (
@@ -320,7 +320,7 @@ tmp<volSymmTensorField> kOmegaSST::R() const
 }
 
 
-tmp<volSymmTensorField> kOmegaSST::devReff() const
+tmp<volSymmTensorField> kOmegaSSTBuoyancy::devReff() const
 {
     return tmp<volSymmTensorField>
     (
@@ -340,7 +340,7 @@ tmp<volSymmTensorField> kOmegaSST::devReff() const
 }
 
 
-tmp<fvVectorMatrix> kOmegaSST::divDevReff() const
+tmp<fvVectorMatrix> kOmegaSSTBuoyancy::divDevReff() const
 {
     return
     (
@@ -350,7 +350,7 @@ tmp<fvVectorMatrix> kOmegaSST::divDevReff() const
 }
 
 
-bool kOmegaSST::read()
+bool kOmegaSSTBuoyancy::read()
 {
     if (RASModel::read())
     {
@@ -377,7 +377,7 @@ bool kOmegaSST::read()
 }
 
 
-void kOmegaSST::correct()
+void kOmegaSSTBuoyancy::correct()
 {
     // Bound in case of topological change
     // HJ, 22/Aug/2007
@@ -412,24 +412,56 @@ void kOmegaSST::correct()
 
     const volScalarField F1(this->F1(CDkOmega));
 
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -start (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+        
+    // Access to the density
+    volScalarField& rho_ = const_cast<volScalarField&>
+        (
+          this->mesh_.objectRegistry::template
+          lookupObject<volScalarField>("rho")
+        );
+
+    // Mass flux
+    surfaceScalarField rhoPhi = fvc::interpolate(rho_)*this->phi_;
+
+    // Gravitational acceleration
+    dimensionedVector g
+    (
+		"g",
+		dimensionSet(0, 1, -2, 0, 0, 0, 0),
+		vector(0, 0, -9.81)
+    );
+    
+    // Constant coefficients
+    scalar sigmaT = 0.85;	//turbulent Prandtl number (dimensionless)
+    
+    // Buoyancy correction term
+    volScalarField Gb("Gb", -nut_/sigmaT*(g & fvc::grad(rho_)));
+
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -end (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+
     // Turbulent frequency equation
     fvScalarMatrix omegaEqn
     (
-        fvm::ddt(omega_)
-      + fvm::div(phi_, omega_)
-      + fvm::SuSp(-fvc::div(phi_), omega_)
-      - fvm::laplacian(DomegaEff(F1), omega_)
+        fvm::ddt(rho_, omega_)
+      + fvm::div(rhoPhi, omega_)
+      + fvm::SuSp(-fvc::div(rhoPhi), omega_)
+      - fvm::laplacian(rho_*DomegaEff(F1), omega_)
      ==
-        gamma(F1)
+        rho_*gamma(F1)
        *min
         (
             S2,
             (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2))
         )
-      - fvm::Sp(beta(F1)*omega_, omega_)
+      - fvm::Sp(rho_*beta(F1)*omega_, omega_)
       - fvm::SuSp
         (
-            (F1 - scalar(1))*CDkOmega/omega_,
+            rho_*(F1 - scalar(1))*CDkOmega/omega_,
             omega_
         )
     );
@@ -446,13 +478,14 @@ void kOmegaSST::correct()
     // Turbulent kinetic energy equation
     fvScalarMatrix kEqn
     (
-        fvm::ddt(k_)
-      + fvm::div(phi_, k_)
-      + fvm::SuSp(-fvc::div(phi_), k_)
-      - fvm::laplacian(DkEff(F1), k_)
+        fvm::ddt(rho_, k_)
+      + fvm::div(rhoPhi, k_)
+      + fvm::SuSp(-fvc::div(rhoPhi), k_)
+      - fvm::laplacian(rho_*DkEff(F1), k_)
      ==
-        min(G, c1_*betaStar_*k_*omega_)
-      - fvm::Sp(betaStar_*omega_, k_)
+        min(rho_*G, c1_*betaStar_*rho_*k_*omega_)
+      + fvm::Sp(Gb/k_, k_) //buoyancy correction in k-eqn (Brecht DEVOLDER, 19 september 2017)
+      - fvm::Sp(rho_*betaStar_*omega_, k_)
     );
 
     kEqn.relax();
