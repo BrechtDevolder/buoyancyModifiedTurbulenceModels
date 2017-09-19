@@ -65,11 +65,11 @@ createBaseTurbulenceModel
 // RAS models
 // -------------------------------------------------------------------------- //
 
-#include "kOmega.H"
-makeRASModel(kOmega);
+#include "kOmegaBuoyancy.H"
+makeRASModel(kOmegaBuoyancy);
 
-#include "kOmegaSST.H"
-makeRASModel(kOmegaSST);
+#include "kOmegaSSTBuoyancy.H"
+makeRASModel(kOmegaSSTBuoyancy);
 
 
 // ************************************************************************* //
