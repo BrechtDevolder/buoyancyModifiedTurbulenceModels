@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "kOmega.H"
+#include "kOmegaSSTBuoyancy.H"
 #include "addToRunTimeSelectionTable.H"
 
 #include "backwardsCompatibilityWallFunctions.H"
@@ -39,12 +39,81 @@ namespace RASModels
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(kOmega, 0);
-addToRunTimeSelectionTable(RASModel, kOmega, dictionary);
+defineTypeNameAndDebug(kOmegaSSTBuoyancy, 0);
+addToRunTimeSelectionTable(RASModel, kOmegaSSTBuoyancy, dictionary);
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+tmp<volScalarField> kOmegaSSTBuoyancy::F1(const volScalarField& CDkOmega) const
+{
+    tmp<volScalarField> CDkOmegaPlus = max
+    (
+        CDkOmega,
+        dimensionedScalar("1.0e-10", dimless/sqr(dimTime), 1.0e-10)
+    );
+
+    tmp<volScalarField> arg1 = min
+    (
+        min
+        (
+            max
+            (
+                (scalar(1)/betaStar_)*sqrt(k_)/(omega_*y_),
+                scalar(500)*nu()/(sqr(y_)*omega_)
+            ),
+            (4*alphaOmega2_)*k_/(CDkOmegaPlus*sqr(y_))
+        ),
+        scalar(10)
+    );
+
+    return tanh(pow4(arg1));
+}
+
+
+tmp<volScalarField> kOmegaSSTBuoyancy::F2() const
+{
+    tmp<volScalarField> arg2 = min
+    (
+        max
+        (
+            (scalar(2)/betaStar_)*sqrt(k_)/(omega_*y_),
+            scalar(500)*nu()/(sqr(y_)*omega_)
+        ),
+        scalar(100)
+    );
+
+    return tanh(sqr(arg2));
+}
+
+
+tmp<volScalarField> kOmegaSSTBuoyancy::F3() const
+{
+    tmp<volScalarField> arg3 = min
+    (
+        150*nu()/(omega_*sqr(y_)),
+        scalar(10)
+    );
+
+    return 1 - tanh(pow4(arg3));
+}
+
+
+tmp<volScalarField> kOmegaSSTBuoyancy::F23() const
+{
+    tmp<volScalarField> f23(F2());
+
+    if (F3_)
+    {
+        f23() *= F3();
+    }
+
+    return f23;
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-kOmega::kOmega
+kOmegaSSTBuoyancy::kOmegaSSTBuoyancy
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
@@ -55,7 +124,79 @@ kOmega::kOmega
 :
     RASModel(modelName, U, phi, transport, turbulenceModelName),
 
-    Cmu_
+    alphaK1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "alphaK1",
+            coeffDict_,
+            0.85034
+        )
+    ),
+    alphaK2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "alphaK2",
+            coeffDict_,
+            1.0
+        )
+    ),
+    alphaOmega1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "alphaOmega1",
+            coeffDict_,
+            0.5
+        )
+    ),
+    alphaOmega2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "alphaOmega2",
+            coeffDict_,
+            0.85616
+        )
+    ),
+    gamma1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "gamma1",
+            coeffDict_,
+            0.5532
+        )
+    ),
+    gamma2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "gamma2",
+            coeffDict_,
+            0.4403
+        )
+    ),
+    beta1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "beta1",
+            coeffDict_,
+            0.075
+        )
+    ),
+    beta2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "beta2",
+            coeffDict_,
+            0.0828
+        )
+    ),
+    betaStar_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
@@ -64,42 +205,44 @@ kOmega::kOmega
             0.09
         )
     ),
-    beta_
+    a1_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "beta",
+            "a1",
             coeffDict_,
-            0.072
+            0.31
         )
     ),
-    alpha_
+    b1_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "alpha",
+            "b1",
             coeffDict_,
-            0.52
+            1.0
         )
     ),
-    alphaK_
+    c1_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "alphaK",
+            "c1",
             coeffDict_,
-            0.5
+            10.0
         )
     ),
-    alphaOmega_
+    F3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        Switch::lookupOrAddToDict
         (
-            "alphaOmega",
+            "F3",
             coeffDict_,
-            0.5
+            false
         )
     ),
+
+    y_(mesh_),
 
     k_
     (
@@ -141,7 +284,15 @@ kOmega::kOmega
     bound(k_, kMin_);
     bound(omega_, omegaMin_);
 
-    nut_ = k_/omega_;
+    nut_ =
+    (
+        a1_*k_
+      / max
+        (
+            a1_*omega_,
+            b1_*F23()*sqrt(2.0)*mag(symm(fvc::grad(U_)))
+        )
+    );
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -150,7 +301,7 @@ kOmega::kOmega
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<volSymmTensorField> kOmega::R() const
+tmp<volSymmTensorField> kOmegaSSTBuoyancy::R() const
 {
     return tmp<volSymmTensorField>
     (
@@ -171,7 +322,7 @@ tmp<volSymmTensorField> kOmega::R() const
 }
 
 
-tmp<volSymmTensorField> kOmega::devReff() const
+tmp<volSymmTensorField> kOmegaSSTBuoyancy::devReff() const
 {
     return tmp<volSymmTensorField>
     (
@@ -191,7 +342,7 @@ tmp<volSymmTensorField> kOmega::devReff() const
 }
 
 
-tmp<fvVectorMatrix> kOmega::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> kOmegaSSTBuoyancy::divDevReff(volVectorField& U) const
 {
     return
     (
@@ -201,7 +352,7 @@ tmp<fvVectorMatrix> kOmega::divDevReff(volVectorField& U) const
 }
 
 
-tmp<fvVectorMatrix> kOmega::divDevRhoReff
+tmp<fvVectorMatrix> kOmegaSSTBuoyancy::divDevRhoReff
 (
     const volScalarField& rho,
     volVectorField& U
@@ -217,14 +368,23 @@ tmp<fvVectorMatrix> kOmega::divDevRhoReff
 }
 
 
-bool kOmega::read()
+bool kOmegaSSTBuoyancy::read()
 {
     if (RASModel::read())
     {
-        Cmu_.readIfPresent(coeffDict());
-        beta_.readIfPresent(coeffDict());
-        alphaK_.readIfPresent(coeffDict());
-        alphaOmega_.readIfPresent(coeffDict());
+        alphaK1_.readIfPresent(coeffDict());
+        alphaK2_.readIfPresent(coeffDict());
+        alphaOmega1_.readIfPresent(coeffDict());
+        alphaOmega2_.readIfPresent(coeffDict());
+        gamma1_.readIfPresent(coeffDict());
+        gamma2_.readIfPresent(coeffDict());
+        beta1_.readIfPresent(coeffDict());
+        beta2_.readIfPresent(coeffDict());
+        betaStar_.readIfPresent(coeffDict());
+        a1_.readIfPresent(coeffDict());
+        b1_.readIfPresent(coeffDict());
+        c1_.readIfPresent(coeffDict());
+        F3_.readIfPresent("F3", coeffDict());
 
         return true;
     }
@@ -235,7 +395,7 @@ bool kOmega::read()
 }
 
 
-void kOmega::correct()
+void kOmegaSSTBuoyancy::correct()
 {
     RASModel::correct();
 
@@ -244,20 +404,38 @@ void kOmega::correct()
         return;
     }
 
-    volScalarField G(GName(), nut_*2*magSqr(symm(fvc::grad(U_))));
+    if (mesh_.changing())
+    {
+        y_.correct();
+    }
+
+    const volScalarField S2(2*magSqr(symm(fvc::grad(U_))));
+    volScalarField G(GName(), nut_*S2);
 
     // Update omega and G at the wall
     omega_.boundaryField().updateCoeffs();
 
-    // Turbulence specific dissipation rate equation
+    const volScalarField CDkOmega
+    (
+        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_
+    );
+
+    const volScalarField F1(this->F1(CDkOmega));
+
+    // Turbulent frequency equation
     tmp<fvScalarMatrix> omegaEqn
     (
         fvm::ddt(omega_)
       + fvm::div(phi_, omega_)
-      - fvm::laplacian(DomegaEff(), omega_)
+      - fvm::laplacian(DomegaEff(F1), omega_)
      ==
-        alpha_*G*omega_/k_
-      - fvm::Sp(beta_*omega_, omega_)
+        gamma(F1)*S2
+      - fvm::Sp(beta(F1)*omega_, omega_)
+      - fvm::SuSp
+        (
+            (F1 - scalar(1))*CDkOmega/omega_,
+            omega_
+        )
     );
 
     omegaEqn().relax();
@@ -267,16 +445,15 @@ void kOmega::correct()
     solve(omegaEqn);
     bound(omega_, omegaMin_);
 
-
     // Turbulent kinetic energy equation
     tmp<fvScalarMatrix> kEqn
     (
         fvm::ddt(k_)
       + fvm::div(phi_, k_)
-      - fvm::laplacian(DkEff(), k_)
+      - fvm::laplacian(DkEff(F1), k_)
      ==
-        G
-      - fvm::Sp(Cmu_*omega_, k_)
+        min(G, c1_*betaStar_*k_*omega_)
+      - fvm::Sp(betaStar_*omega_, k_)
     );
 
     kEqn().relax();
@@ -285,7 +462,7 @@ void kOmega::correct()
 
 
     // Re-calculate viscosity
-    nut_ = k_/omega_;
+    nut_ = a1_*k_/max(a1_*omega_, b1_*F23()*sqrt(S2));
     nut_.correctBoundaryConditions();
 }
 

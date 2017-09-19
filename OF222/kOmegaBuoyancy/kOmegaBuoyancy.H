@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::incompressible::RASModels::kOmega
+    Foam::incompressible::RASModels::kOmegaBuoyancy
 
 Group
     grpIcoRASTurbulence
@@ -44,7 +44,7 @@ Description
 
     The default model coefficients correspond to the following:
     \verbatim
-        kOmegaCoeffs
+        kOmegaBuoyancyCoeffs
         {
             Cmu         0.09;  // Equivalent to betaStar
             alpha       0.52;
@@ -55,12 +55,12 @@ Description
     \endverbatim
 
 SourceFiles
-    kOmega.C
+    kOmegaBuoyancy.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef kOmega_H
-#define kOmega_H
+#ifndef kOmegaBuoyancy_H
+#define kOmegaBuoyancy_H
 
 #include "RASModel.H"
 
@@ -74,10 +74,10 @@ namespace RASModels
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class kOmega Declaration
+                           Class kOmegaBuoyancy Declaration
 \*---------------------------------------------------------------------------*/
 
-class kOmega
+class kOmegaBuoyancy
 :
     public RASModel
 {
@@ -105,12 +105,12 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("kOmega");
+    TypeName("kOmegaBuoyancy");
 
     // Constructors
 
         //- Construct from components
-        kOmega
+        kOmegaBuoyancy
         (
             const volVectorField& U,
             const surfaceScalarField& phi,
@@ -121,7 +121,7 @@ public:
 
 
     //- Destructor
-    virtual ~kOmega()
+    virtual ~kOmegaBuoyancy()
     {}
 
 
