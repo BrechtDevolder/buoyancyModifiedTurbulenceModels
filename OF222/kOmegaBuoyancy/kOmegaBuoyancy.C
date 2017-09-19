@@ -249,15 +249,47 @@ void kOmegaBuoyancy::correct()
     // Update omega and G at the wall
     omega_.boundaryField().updateCoeffs();
 
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -start (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+        
+    // Access to the density
+    volScalarField& rho_ = const_cast<volScalarField&>
+        (
+          this->mesh_.objectRegistry::template
+          lookupObject<volScalarField>("rho")
+        );
+
+    // Mass flux
+    surfaceScalarField rhoPhi = fvc::interpolate(rho_)*this->phi_;
+
+    // Gravitational acceleration
+    dimensionedVector g
+    (
+		"g",
+		dimensionSet(0, 1, -2, 0, 0, 0, 0),
+		vector(0, 0, -9.81)
+    );
+    
+    // Constant coefficients
+    scalar sigmaT = 0.85;	//turbulent Prandtl number (dimensionless)
+    
+    // Buoyancy correction term
+    volScalarField Gb("Gb", -nut_/sigmaT*(g & fvc::grad(rho_)));
+
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -end (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+
     // Turbulence specific dissipation rate equation
     tmp<fvScalarMatrix> omegaEqn
     (
-        fvm::ddt(omega_)
-      + fvm::div(phi_, omega_)
-      - fvm::laplacian(DomegaEff(), omega_)
+        fvm::ddt(rho_, omega_)
+      + fvm::div(rhoPhi, omega_)
+      - fvm::laplacian(rho_/DomegaEff(), omega_)
      ==
-        alpha_*G*omega_/k_
-      - fvm::Sp(beta_*omega_, omega_)
+        rho_*alpha_*G*omega_/k_
+      - fvm::Sp(rho_*beta_*omega_, omega_)
     );
 
     omegaEqn().relax();
@@ -271,12 +303,13 @@ void kOmegaBuoyancy::correct()
     // Turbulent kinetic energy equation
     tmp<fvScalarMatrix> kEqn
     (
-        fvm::ddt(k_)
-      + fvm::div(phi_, k_)
-      - fvm::laplacian(DkEff(), k_)
+        fvm::ddt(rho_, k_)
+      + fvm::div(rhoPhi, k_)
+      - fvm::laplacian(rho_*DkEff(), k_)
      ==
-        G
-      - fvm::Sp(Cmu_*omega_, k_)
+        rho_*G
+      + fvm::Sp(Gb/k_, k_) //buoyancy correction in k-eqn (Brecht DEVOLDER, 19 september 2017)
+      - fvm::Sp(rho_*Cmu_*omega_, k_)
     );
 
     kEqn().relax();
