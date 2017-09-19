@@ -286,7 +286,7 @@ void kOmegaBuoyancy::correct()
     (
         fvm::ddt(rho_, omega_)
       + fvm::div(rhoPhi, omega_)
-      - fvm::laplacian(rho_/DomegaEff(), omega_)
+      - fvm::laplacian(rho_*DomegaEff(), omega_)
      ==
         rho_*alpha_*G*omega_/k_
       - fvm::Sp(rho_*beta_*omega_, omega_)
