@@ -444,10 +444,10 @@ void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
         
     // Access to the density
     volScalarField& rho_ = const_cast<volScalarField&>
-        (
-          this->mesh_.objectRegistry::template
-          lookupObject<volScalarField>("rho")
-        );
+    (
+        this->mesh_.objectRegistry::template
+        lookupObject<volScalarField>("rho")
+    );
 
     // Mass flux
     surfaceScalarField rhoPhi = fvc::interpolate(rho_)*this->phi_;
@@ -455,13 +455,19 @@ void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
     // Gravitational acceleration
     dimensionedVector g
     (
-		"g",
-		dimensionSet(0, 1, -2, 0, 0, 0, 0),
-		vector(0, 0, -9.81)
+        "g",
+        dimensionSet(0, 1, -2, 0, 0, 0, 0),
+        vector(0, 0, -9.81)
     );
     
     // Constant coefficients
     scalar sigmaT = 0.85;	//turbulent Prandtl number (dimensionless)
+    dimensionedScalar kSmall
+    (
+        "kSmall",
+        k_.dimensions(),
+        SMALL
+    );
     
     // Buoyancy correction term
     volScalarField Gb("Gb", -nut/sigmaT*(g & fvc::grad(rho_)));
@@ -515,7 +521,7 @@ void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
       - fvm::laplacian(alpha*rho_*DkEff(F1), k_)
      ==
         min(alpha*rho_*G, (c1_*betaStar_)*alpha*rho_*k_*omega_)
-      + fvm::Sp(Gb/k_, k_)	//buoyancy correction in k-eqn (Brecht DEVOLDER, 19 september 2017)
+      + fvm::Sp(Gb/max(k_, kSmall), k_)	//buoyancy correction in k-eqn (Brecht DEVOLDER, 19 september 2017)
       - fvm::SuSp((2.0/3.0)*alpha*rho_*divU, k_)
       - fvm::Sp(alpha*rho_*epsilonByk(F1, F23), k_)
       + rho_*kSource()
