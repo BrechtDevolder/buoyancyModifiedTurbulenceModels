@@ -63,11 +63,17 @@ are published:
 
 - Modify system/fvSchemes:
 
+      ddt(k)
+      ddt(omega)
+      ...
       div(phi,k)
       div(phi,omega)
 		
     to
 
+      ddt(rho,k)
+      ddt(rho,omega)
+      ...
       div((interpolate(rho)*phi),k)
       div((interpolate(rho)*phi),omega)
 
