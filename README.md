@@ -19,8 +19,8 @@ Flanders (FWO), Belgium (Ph.D. fellowship 1133817N).
 If you want to reference the model in your publications, you can use the 
 following references in which the implementation and validation details 
 are published:  
-- Devolder, B., Rauwoens, P., & Troch, P. (2017). Application of a buoyancy-modified *k-ω SST* turbulence model to simulate wave run-up around a monopile subjected to regular waves using OpenFOAM<sup>®</sup>. Coastal Engineering, 125, 81–94. [https://doi.org/10.1016/j.coastaleng.2017.04.004](https://doi.org/10.1016/j.coastaleng.2017.04.004)
-- Devolder, B., Troch, P., & Rauwoens, P. (2017). Performance of a buoyancy-modified *k-ω* and *k-ω SST* turbulence model for simulating wave breaking under regular waves using OpenFOAM<sup>®</sup>. *Under review for Coastal Engineering.*
+- Devolder, B., Rauwoens, P., & Troch, P. (2017). Application of a buoyancy-modified *k-ω SST* turbulence model to simulate wave run-up around a monopile subjected to regular waves using OpenFOAM<sup>®</sup>. Coastal Engineering, 125, 81–94. [doi:10.1016/j.coastaleng.2017.04.004](https://doi.org/10.1016/j.coastaleng.2017.04.004).
+- Devolder, B., Troch, P., & Rauwoens, P. (2018). Performance of a buoyancy-modified *k-ω* and *k-ω SST* turbulence model for simulating wave breaking under regular waves using OpenFOAM<sup>®</sup>. Coastal Engineering, 138, 49–65. [doi:10.1016/j.coastaleng.2018.04.011](https://doi.org/10.1016/j.coastaleng.2018.04.011).
 
 ## Installation
 
@@ -84,25 +84,26 @@ are published:
 
 ## Contributors
 
-- ir. Brecht DEVOLDER  
+- Brecht DEVOLDER  
 
 	> Department of Civil Engineering, Ghent University  
 	> Technologiepark 904, B-9052 Zwijnaarde (GENT), BELGIUM  
-	> <Brecht.Devolder@UGent.be>  
+	> <brecht.devolder@ugent.be>  
 	
 	> Construction Technology Cluster, Campus Bruges, Department of Civil Engineering, KU Leuven  
-	> Spoorwegstraat 12, B-8200 Bruges, BELGIUM
+	> Spoorwegstraat 12, B-8200 Bruges, BELGIUM  
+	> <brecht.devolder@kuleuven.be>  
 
 	
-- prof. dr. ir. Peter TROCH  
+- prof. Peter TROCH  
 
 	> Department of Civil Engineering, Ghent University  
 	> Technologiepark 904, B-9052 Zwijnaarde (GENT), BELGIUM  
-	> <Peter.Troch@UGent.be>  
+	> <peter.troch@ugent.be>  
 
 	
-- prof. dr. ir. Pieter RAUWOENS  
+- prof. Pieter RAUWOENS  
 
 	> Construction Technology Cluster, Campus Bruges, Department of Civil Engineering, KU Leuven  
 	> Spoorwegstraat 12, B-8200 Bruges, BELGIUM  
-	> <Pieter.Rauwoens@KULeuven.be>  
+	> <pieter.rauwoens@kuleuven.be>  
