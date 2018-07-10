@@ -423,7 +423,7 @@ void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
 
     // Local references
     const alphaField& alpha = this->alpha_;
-    const rhoField& rho = this->rho_;
+    //const rhoField& rho = this->rho_;
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
     const volVectorField& U = this->U_;
     volScalarField& nut = this->nut_;
@@ -453,6 +453,44 @@ void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
     volScalarField F1(this->F1(CDkOmega));
     volScalarField F23(this->F23());
 
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -start (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+        
+    // Access to the density
+    volScalarField& rho_ = const_cast<volScalarField&>
+    (
+        this->mesh_.objectRegistry::template
+        lookupObject<volScalarField>("rho")
+    );
+
+    // Mass flux
+    surfaceScalarField rhoPhi = fvc::interpolate(rho_)*this->phi_;
+
+    // Gravitational acceleration
+    dimensionedVector g
+    (
+        "g",
+        dimensionSet(0, 1, -2, 0, 0, 0, 0),
+        vector(0, 0, -9.81)
+    );
+    
+    // Constant coefficients
+    scalar sigmaT = 0.85;	//turbulent Prandtl number (dimensionless)
+    dimensionedScalar kSmall
+    (
+        "kSmall",
+        k_.dimensions(),
+        SMALL
+    );
+    
+    // Buoyancy correction term
+    volScalarField Gb("Gb", -nut/sigmaT*(g & fvc::grad(rho_)));
+
+////////////////////////////////////////////////////////////////////////
+// Buoyancy correction -end (Brecht DEVOLDER, 19 september 2017)
+////////////////////////////////////////////////////////////////////////
+
     {
         volScalarField::Internal gamma(this->gamma(F1));
         volScalarField::Internal beta(this->beta(F1));
@@ -460,27 +498,27 @@ void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
         // Turbulent frequency equation
         tmp<fvScalarMatrix> omegaEqn
         (
-            fvm::ddt(alpha, rho, omega_)
-          + fvm::div(alphaRhoPhi, omega_)
-          - fvm::laplacian(alpha*rho*DomegaEff(F1), omega_)
+            fvm::ddt(alpha, rho_, omega_)
+          + fvm::div(rhoPhi, omega_)
+          - fvm::laplacian(alpha*rho_*DomegaEff(F1), omega_)
          ==
-            alpha()*rho()*gamma
+            alpha()*rho_()*gamma
            *min
             (
                 GbyNu,
                 (c1_/a1_)*betaStar_*omega_()
                *max(a1_*omega_(), b1_*F23()*sqrt(S2()))
             )
-          - fvm::SuSp((2.0/3.0)*alpha()*rho()*gamma*divU, omega_)
-          - fvm::Sp(alpha()*rho()*beta*omega_(), omega_)
+          - fvm::SuSp((2.0/3.0)*alpha()*rho_()*gamma*divU, omega_)
+          - fvm::Sp(alpha()*rho_()*beta*omega_(), omega_)
           - fvm::SuSp
             (
-                alpha()*rho()*(F1() - scalar(1))*CDkOmega()/omega_(),
+                alpha()*rho_()*(F1() - scalar(1))*CDkOmega()/omega_(),
                 omega_
             )
-          + Qsas(S2(), gamma, beta)
-          + omegaSource()
-          + fvOptions(alpha, rho, omega_)
+          + rho_*Qsas(S2(), gamma, beta)
+          + rho_*omegaSource()
+          + fvOptions(alpha, rho_, omega_)
         );
 
         omegaEqn.ref().relax();
@@ -494,15 +532,16 @@ void kOmegaSSTBuoyancy<TurbulenceModel, BasicTurbulenceModel>::correct()
     // Turbulent kinetic energy equation
     tmp<fvScalarMatrix> kEqn
     (
-        fvm::ddt(alpha, rho, k_)
-      + fvm::div(alphaRhoPhi, k_)
-      - fvm::laplacian(alpha*rho*DkEff(F1), k_)
+        fvm::ddt(alpha, rho_, k_)
+      + fvm::div(rhoPhi, k_)
+      - fvm::laplacian(alpha*rho_*DkEff(F1), k_)
      ==
-        alpha()*rho()*Pk(G)
-      - fvm::SuSp((2.0/3.0)*alpha()*rho()*divU, k_)
-      - fvm::Sp(alpha()*rho()*epsilonByk(F1, F23), k_)
-      + kSource()
-      + fvOptions(alpha, rho, k_)
+        alpha()*rho_()*Pk(G)
+      + fvm::Sp(Gb/max(k_, kSmall), k_) //buoyancy correction in k-eqn (Brecht DEVOLDER, 10 July 2018)
+      - fvm::SuSp((2.0/3.0)*alpha()*rho_()*divU, k_)
+      - fvm::Sp(alpha()*rho_()*epsilonByk(F1, F23), k_)
+      + rho_*kSource()
+      + fvOptions(alpha, rho_, k_)
     );
 
     kEqn.ref().relax();
